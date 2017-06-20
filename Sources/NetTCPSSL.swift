@@ -685,7 +685,12 @@ extension NetTCPSSL {
 			}
 			
 			let serverLen = UInt32(serverBuf.count)
-			return outBuf.withMemoryRebound(to: UnsafeMutablePointer<UInt8>?.self, capacity: 1) {
+			#if os(Linux)
+				let pointer = UnsafeMutablePointer<UInt8>?.self!
+			#else
+				let pointer = UnsafeMutablePointer<UInt8>?.self
+			#endif
+			return outBuf.withMemoryRebound(to: pointer, capacity: 1) {
 				outBuf in
 				let result = SSL_select_next_proto(outBuf, outLen,
 				                                   serverBuf, serverLen,
